@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.spring.be_booktours.dtos.MyResponse;
 import com.spring.be_booktours.dtos.hotel.HotelRequest;
+import com.spring.be_booktours.dtos.hotel.RoomAmenitiesPreferentialRequest;
 import com.spring.be_booktours.dtos.hotel.RoomRequest;
 import com.spring.be_booktours.entities.sub_entities.HotelAmenities;
 import com.spring.be_booktours.entities.sub_entities.RoomAmenities;
@@ -76,25 +77,29 @@ public class AdminHotelController {
         return ResponseEntity.ok(hotelService.deleteRoom(hotelId, roomId));
     }
 
-    // Cập nhật tiện ích riêng của phòng
-    @PutMapping("{hotelId}/update-roomamenities/{roomId}")
+    // Cập nhật ưu đãi, tiện ích riêng của phòng
+    @PutMapping("{hotelId}/update-roomamenities-preferential/{roomId}")
     public ResponseEntity<?> updateRoomAmenities(@PathVariable String hotelId, @PathVariable String roomId,
-            @Valid @RequestBody RoomAmenities amenities) {
-        return ResponseEntity.ok(hotelService.updateRoomAmenities(hotelId, roomId, amenities));
+            @Valid @RequestBody RoomAmenitiesPreferentialRequest input) {
+        return ResponseEntity.ok(hotelService.updateRoomAmenities(hotelId, roomId, input));
     }
 
     // Cập nhật ưu đãi của phòng
-    @PutMapping("{hotelId}/update-roompreferential/{roomId}")
-    public ResponseEntity<?> updateRoomPreferential(@PathVariable String hotelId, @PathVariable String roomId,
-            @Valid @RequestBody Set<String> preferential) {
-        return ResponseEntity.ok(hotelService.updateRoomPreferential(hotelId, roomId, preferential));
-    }
+    // @PutMapping("{hotelId}/update-roompreferential/{roomId}")
+    // public ResponseEntity<?> updateRoomPreferential(@PathVariable String hotelId,
+    // @PathVariable String roomId,
+    // @Valid @RequestBody Set<String> preferential) {
+    // return ResponseEntity.ok(hotelService.updateRoomPreferential(hotelId, roomId,
+    // preferential));
+    // }
 
     // sửa giảm giá của 1 phòng
     // @PutMapping("{hotelId}/update-roomdiscount/{roomId}")
-    // public ResponseEntity<?> updateRoomDiscount(@PathVariable String hotelId, @PathVariable String roomId,
-    //         @RequestParam(defaultValue = "0", required = true) int discount) {
-    //     return ResponseEntity.ok(hotelService.updateRoomDiscount(hotelId, roomId, discount));
+    // public ResponseEntity<?> updateRoomDiscount(@PathVariable String hotelId,
+    // @PathVariable String roomId,
+    // @RequestParam(defaultValue = "0", required = true) int discount) {
+    // return ResponseEntity.ok(hotelService.updateRoomDiscount(hotelId, roomId,
+    // discount));
     // }
 
     // sửa giảm giá của tất cả các phòng

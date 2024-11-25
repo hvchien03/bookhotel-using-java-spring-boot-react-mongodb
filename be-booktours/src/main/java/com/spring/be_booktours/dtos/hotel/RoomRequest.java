@@ -33,11 +33,12 @@ public class RoomRequest {
     @Min(value = 1, message = "Số khách phải lớn hơn 0")
     private int maxGuests; // số khách tối đa
 
-    @Min(value = 0, message = "Giảm giá phải lớn hơn hoặc bằng 0")
+    @NotNull(message = ">= 0")
+    @Min(value = 0, message = ">= 0")
     private int discount; // giảm giá
 
-    @NotNull(message = "Diện tích phòng không được để trống")
-    @Positive(message = "Diện tích phòng phải là số dương")
+    @NotNull(message = ">= 20")
+    @Positive(message = ">= 20")
     private double roomSize; // diện tích phòng
 
     @NotBlank(message = "Phong cảnh không được để trống")

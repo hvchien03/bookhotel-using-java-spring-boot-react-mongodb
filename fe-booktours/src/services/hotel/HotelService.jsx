@@ -142,4 +142,43 @@ export default class HotelService {
       throw error;
     }
   }
+
+  // sửa thông tin phòng băng hotelId và truyền vào room
+  static async updateBasicRoom(hotelId, room) {
+    try {
+      const response = await axios.put(
+        this.ADMIN_URL + `/${hotelId}/update-room/${room.roomId}`,
+        room,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  //sửa thông tin ưu đãi, tiện nghi của phòng
+  static async updateRoomamenitiesPreferential(hotelId, room) {
+    console.log(hotelId, room);
+    try {
+      const response = await axios.put(
+        this.ADMIN_URL + `/${hotelId}/update-roomamenities-preferential/${room.roomId}`,
+        room,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  }
 }

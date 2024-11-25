@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.spring.be_booktours.dtos.MyResponse;
 import com.spring.be_booktours.dtos.hotel.HotelRequest;
+import com.spring.be_booktours.dtos.hotel.RoomAmenitiesPreferentialRequest;
 import com.spring.be_booktours.dtos.hotel.RoomRequest;
 import com.spring.be_booktours.entities.Hotel;
 import com.spring.be_booktours.entities.sub_entities.HotelAmenities;
@@ -186,7 +187,7 @@ public class HotelService {
     }
 
     // phòng
-    // thêm mới 1 phòng cho khách sạn, thêm được đầy đủ các thông tin
+    // thêm mới 1 phòng cho khách sạn
     public MyResponse<String> addNewRoomForHotel(String hotelId, RoomRequest inputRoom) {
         MyResponse<String> response = new MyResponse<>();
         Hotel hotel = hotelRepository.findById(hotelId).orElse(null);
@@ -275,7 +276,7 @@ public class HotelService {
     }
 
     // thêm xoá sửa các tiện ích của phòng
-    public MyResponse<RoomAmenities> updateRoomAmenities(String hotelId, String roomId, RoomAmenities inputAmenities) {
+    public MyResponse<RoomAmenities> updateRoomAmenities(String hotelId, String roomId, RoomAmenitiesPreferentialRequest input) {
         MyResponse<RoomAmenities> response = new MyResponse<>();
         Hotel hotel = hotelRepository.findById(hotelId).orElse(null);
         if (hotel == null) {
@@ -288,7 +289,8 @@ public class HotelService {
                 response.setStatus(404);
                 response.setMessage("Không tìm thấy phòng");
             } else {
-                room.setRoomAmenities(inputAmenities);
+                room.setRoomAmenities(input.getRoomAmenities());
+                room.setPreferential(input.getPreferential());
                 hotelRepository.save(hotel);
                 response.setStatus(200);
                 response.setMessage("Cập nhật tiện nghi phòng" + roomId + ", khách sạn " + hotelId + " thành công");
@@ -299,33 +301,9 @@ public class HotelService {
     }
 
     // thêm, xoá sửa các ưu đãi của phòng
-    public MyResponse<Set<String>> updateRoomPreferential(String hotelId, String roomId,
-            Set<String> inputPreferential) {
-        MyResponse<Set<String>> response = new MyResponse<>();
-        Hotel hotel = hotelRepository.findById(hotelId).orElse(null);
-        if (hotel == null) {
-            response.setStatus(404);
-            response.setMessage("Không tìm thấy khách sạn");
-        } else {
-            Room room = hotel.getRoomTypes().stream().filter(r -> r.getRoomId().equals(roomId)).findFirst()
-                    .orElse(null);
-            if (room == null) {
-                response.setStatus(404);
-                response.setMessage("Không tìm thấy phòng");
-            } else {
-                room.setPreferential(inputPreferential);
-                hotelRepository.save(hotel);
-                response.setStatus(200);
-                response.setMessage("Cập nhật ưu đãi phòng" + roomId + ", khách sạn " + hotelId + " thành công");
-                response.setData(room.getPreferential());
-            }
-        }
-        return response;
-    }
-
-    // sửa phần trăm giảm giá của phòng
-    // public MyResponse<Integer> updateRoomDiscount(String hotelId, String roomId, int discount) {
-    //     MyResponse<Integer> response = new MyResponse<>();
+    // public MyResponse<Set<String>> updateRoomPreferential(String hotelId, String roomId,
+    //         Set<String> inputPreferential) {
+    //     MyResponse<Set<String>> response = new MyResponse<>();
     //     Hotel hotel = hotelRepository.findById(hotelId).orElse(null);
     //     if (hotel == null) {
     //         response.setStatus(404);
@@ -337,14 +315,41 @@ public class HotelService {
     //             response.setStatus(404);
     //             response.setMessage("Không tìm thấy phòng");
     //         } else {
-    //             room.setDiscount(discount);
+    //             room.setPreferential(inputPreferential);
     //             hotelRepository.save(hotel);
     //             response.setStatus(200);
-    //             response.setMessage("Cập nhật giảm giá phòng" + roomId + ", khách sạn " + hotelId + " thành công");
-    //             response.setData(room.getDiscount());
+    //             response.setMessage("Cập nhật ưu đãi phòng" + roomId + ", khách sạn " + hotelId + " thành công");
+    //             response.setData(room.getPreferential());
     //         }
     //     }
     //     return response;
+    // }
+
+    // sửa phần trăm giảm giá của phòng
+    // public MyResponse<Integer> updateRoomDiscount(String hotelId, String roomId,
+    // int discount) {
+    // MyResponse<Integer> response = new MyResponse<>();
+    // Hotel hotel = hotelRepository.findById(hotelId).orElse(null);
+    // if (hotel == null) {
+    // response.setStatus(404);
+    // response.setMessage("Không tìm thấy khách sạn");
+    // } else {
+    // Room room = hotel.getRoomTypes().stream().filter(r ->
+    // r.getRoomId().equals(roomId)).findFirst()
+    // .orElse(null);
+    // if (room == null) {
+    // response.setStatus(404);
+    // response.setMessage("Không tìm thấy phòng");
+    // } else {
+    // room.setDiscount(discount);
+    // hotelRepository.save(hotel);
+    // response.setStatus(200);
+    // response.setMessage("Cập nhật giảm giá phòng" + roomId + ", khách sạn " +
+    // hotelId + " thành công");
+    // response.setData(room.getDiscount());
+    // }
+    // }
+    // return response;
     // }
 
     // sửa phần trăm giảm giá cho tất cả các phòng của khách sạn

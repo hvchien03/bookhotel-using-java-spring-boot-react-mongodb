@@ -6,20 +6,7 @@ import HotelService from "../../../services/hotel/HotelService";
 const RoomUpdate = () => {
   const { hotelId, roomId } = useParams();
   const navigate = useNavigate();
-  //   const cancelButtonRef = useRef();
-  //   const [open, setOpen] = useState(false);
-  //   const [discount, setDiscount] = useState(0);
-  //   const [defaultRoom, setDefaultRoom] = useState({
-  //     roomType: "",
-  //     pricePerNight: 1000000,
-  //     maxGuests: 3,
-  //     roomSize: 20,
-  //     view: "",
-  //     discount: 0,
-  //     roomImage: "",
-  //     bedType: [],
-  //   });
-  const imgRef = useRef(null);
+  const imgRef = useRef();
   const [newImage, setNewImage] = useState("");
   const [errors, setErrors] = useState({});
   const [room, setRoom] = useState({});
@@ -27,28 +14,27 @@ const RoomUpdate = () => {
   const [refreshData, setRefreshData] = useState(false);
   //lưu dữ liệu mới của từng loại tiện nghi
   const [newAmenity, setNewAmenity] = useState({
-    hotelAmenities: "",
-    frontDeskServices: "",
-    cleaningServices: "",
-    entertainmentAndRecreation: "",
-    outdoor: "",
-    transportation: "",
+    preferential: "",
+    bathroom: "",
+    safety: "",
+    entertainment: "",
+    foodAndBeverage: "",
+    furniture: "",
   });
   //lưu error của từng loại tiện nghi
   const [amenitiesError, setAmenitiesError] = useState({
-    hotelAmenities: "",
-    frontDeskServices: "",
-    cleaningServices: "",
-    entertainmentAndRecreation: "",
-    outdoor: "",
-    transportation: "",
+    preferential: "",
+    bathroom: "",
+    safety: "",
+    entertainment: "",
+    foodAndBeverage: "",
+    furniture: "",
   });
 
   const handleExits = () => {
     navigate(-1);
   };
-
-  //chưa preview được ảnh, chưa làm các tiện ích khác
+  //xong hàm này
   const handleShowNewImage = () => {
     if (!newImage) return;
     //kiểm tra xem link hình ảnh có hợp lệ không
@@ -61,214 +47,80 @@ const RoomUpdate = () => {
     tempImg.onerror = () => {
       alert("Link hình ảnh không hợp lệ");
       setNewImage("");
+      imgRef.current.src = room.roomImage;
     };
     tempImg.src = newImage;
-    imgRef.current.src = newImage;
+    setRoom({ ...room, roomImage: newImage });
   };
-
-  const handleAddHotelAmenity = () => {
-    if (!newAmenity.hotelAmenities) {
+  //xong hàm này
+  const handleAddPreferential = () => {
+    if (!newAmenity.preferential) {
       setAmenitiesError({
         ...amenitiesError,
-        hotelAmenities: "Không được để trống",
+        preferential: "Không được để trống",
       });
       return;
     }
-    if (hotel.amenities.hotelAmenities.includes(newAmenity.hotelAmenities)) {
+    if (!room.preferential) {
+      room.preferential = [];
+    }
+    if (room.preferential.includes(newAmenity.preferential)) {
       setAmenitiesError({
         ...amenitiesError,
-        hotelAmenities: "Tiện nghi này đã tồn tại",
+        preferential: "Ưu đãi này đã tồn tại",
       });
       return;
     }
-    setHotel({
-      ...hotel,
-      amenities: {
-        ...hotel.amenities,
-        hotelAmenities: [
-          ...hotel.amenities.hotelAmenities,
-          newAmenity.hotelAmenities,
-        ],
-      },
+    setRoom({
+      ...room,
+      preferential: [...room.preferential, newAmenity.preferential],
     });
     setNewAmenity({
-      hotelAmenities: "",
+      preferential: "",
     });
     setAmenitiesError({
-      hotelAmenities: "",
+      preferential: "",
     });
   };
-
-  const handleAddFrontDeskService = () => {
-    if (!newAmenity.frontDeskServices) {
-      setAmenitiesError({
-        ...amenitiesError,
-        frontDeskServices: "Không được để trống",
+  //xong hàm này
+  const handleAddRoomAmenities = (type) => {
+    return () => {
+      if (!newAmenity[type]) {
+        setAmenitiesError({
+          ...amenitiesError,
+          [type]: "Không được để trống",
+        });
+        return;
+      }
+      if (!room.roomAmenities) {
+        room.roomAmenities = {};
+      }
+      if (!room.roomAmenities[type]) {
+        room.roomAmenities[type] = [];
+      }
+      if (room.roomAmenities[type].includes(newAmenity[type])) {
+        setAmenitiesError({
+          ...amenitiesError,
+          [type]: "Tiện nghi này đã tồn tại",
+        });
+        return;
+      }
+      setRoom({
+        ...room,
+        roomAmenities: {
+          ...room.roomAmenities,
+          [type]: [...room.roomAmenities[type], newAmenity[type]],
+        },
       });
-      return;
-    }
-    if (
-      hotel.amenities.frontDeskServices.includes(newAmenity.frontDeskServices)
-    ) {
-      setAmenitiesError({
-        ...amenitiesError,
-        frontDeskServices: "Tiện nghi này đã tồn tại",
+      setNewAmenity({
+        [type]: "",
       });
-      return;
-    }
-    setHotel({
-      ...hotel,
-      amenities: {
-        ...hotel.amenities,
-        frontDeskServices: [
-          ...hotel.amenities.frontDeskServices,
-          newAmenity.frontDeskServices,
-        ],
-      },
-    });
-    setNewAmenity({
-      frontDeskServices: "",
-    });
-    setAmenitiesError({
-      frontDeskServices: "",
-    });
+      setAmenitiesError({
+        [type]: "",
+      });
+    };
   };
-
-  const handleAddCleaningService = () => {
-    if (!newAmenity.cleaningServices) {
-      setAmenitiesError({
-        ...amenitiesError,
-        cleaningServices: "Không được để trống",
-      });
-      return;
-    }
-    if (
-      hotel.amenities.cleaningServices.includes(newAmenity.cleaningServices)
-    ) {
-      setAmenitiesError({
-        ...amenitiesError,
-        cleaningServices: "Tiện nghi này đã tồn tại",
-      });
-      return;
-    }
-    setHotel({
-      ...hotel,
-      amenities: {
-        ...hotel.amenities,
-        cleaningServices: [
-          ...hotel.amenities.cleaningServices,
-          newAmenity.cleaningServices,
-        ],
-      },
-    });
-    setNewAmenity({
-      cleaningServices: "",
-    });
-    setAmenitiesError({
-      cleaningServices: "",
-    });
-  };
-
-  const handleAddEntertainmentService = () => {
-    if (!newAmenity.entertainmentAndRecreation) {
-      setAmenitiesError({
-        ...amenitiesError,
-        entertainmentAndRecreation: "Không được để trống",
-      });
-      return;
-    }
-    if (
-      hotel.amenities.entertainmentAndRecreation.includes(
-        newAmenity.entertainmentAndRecreation
-      )
-    ) {
-      setAmenitiesError({
-        ...amenitiesError,
-        entertainmentAndRecreation: "Tiện nghi này đã tồn tại",
-      });
-      return;
-    }
-    setHotel({
-      ...hotel,
-      amenities: {
-        ...hotel.amenities,
-        entertainmentAndRecreation: [
-          ...hotel.amenities.entertainmentAndRecreation,
-          newAmenity.entertainmentAndRecreation,
-        ],
-      },
-    });
-    setNewAmenity({
-      entertainmentAndRecreation: "",
-    });
-    setAmenitiesError({
-      entertainmentAndRecreation: "",
-    });
-  };
-
-  const handleAddOutdoorService = () => {
-    if (!newAmenity.outdoor) {
-      setAmenitiesError({
-        ...amenitiesError,
-        outdoor: "Không được để trống",
-      });
-      return;
-    }
-    if (hotel.amenities.outdoor.includes(newAmenity.outdoor)) {
-      setAmenitiesError({
-        ...amenitiesError,
-        outdoor: "Tiện nghi này đã tồn tại",
-      });
-      return;
-    }
-    setHotel({
-      ...hotel,
-      amenities: {
-        ...hotel.amenities,
-        outdoor: [...hotel.amenities.outdoor, newAmenity.outdoor],
-      },
-    });
-    setNewAmenity({
-      outdoor: "",
-    });
-    setAmenitiesError({
-      outdoor: "",
-    });
-  };
-
-  const handleAddTransportationService = () => {
-    if (!newAmenity.transportation) {
-      setAmenitiesError({
-        ...amenitiesError,
-        transportation: "Không được để trống",
-      });
-      return;
-    }
-    if (hotel.amenities.transportation.includes(newAmenity.transportation)) {
-      setAmenitiesError({
-        ...amenitiesError,
-        transportation: "Tiện nghi này đã tồn tại",
-      });
-      return;
-    }
-    setHotel({
-      ...hotel,
-      amenities: {
-        ...hotel.amenities,
-        transportation: [
-          ...hotel.amenities.transportation,
-          newAmenity.transportation,
-        ],
-      },
-    });
-    setNewAmenity({
-      transportation: "",
-    });
-    setAmenitiesError({
-      transportation: "",
-    });
-  };
-
+  //xong hàm này
   useEffect(() => {
     document.title = "Quản lý khách sạn";
     window.scrollTo(0, 0);
@@ -278,7 +130,6 @@ const RoomUpdate = () => {
         if (response.status === 200) {
           setRoom(response.data);
           setOldData(response.data);
-          console.log(response.data);
           document.title = `Cập nhật phòng ${response.data.roomType}`;
         }
       } catch (error) {
@@ -287,32 +138,29 @@ const RoomUpdate = () => {
     };
     fetchRoom();
   }, [refreshData]);
+  //xong hàm này
+  useEffect(() => {
+    if (room && room.roomAmenities) {
+      room.roomAmenities.bathroom = room.roomAmenities.bathroom || [];
+      room.roomAmenities.safety = room.roomAmenities.safety || [];
+      room.roomAmenities.entertainment = room.roomAmenities.entertainment || [];
+      room.roomAmenities.foodAndBeverage =
+        room.roomAmenities.foodAndBeverage || [];
+      room.roomAmenities.furniture = room.roomAmenities.furniture || [];
+    }
+  }, [room.roomAmenities]);
 
-  //   useEffect(() => {
-  //     if (hotel && hotel.amenities) {
-  //       hotel.amenities.hotelAmenities = hotel.amenities.hotelAmenities || [];
-  //       hotel.amenities.frontDeskServices =
-  //         hotel.amenities.frontDeskServices || [];
-  //       hotel.amenities.cleaningServices = hotel.amenities.cleaningServices || [];
-  //       hotel.amenities.entertainmentAndRecreation =
-  //         hotel.amenities.entertainmentAndRecreation || [];
-  //       hotel.amenities.outdoor = hotel.amenities.outdoor || [];
-  //       hotel.amenities.transportation = hotel.amenities.transportation || [];
-  //     }
-  //   }, [hotel.amenities]);
-
+  //xong hàm này
   const handleChangeBasic = async () => {
     try {
-      //kiểm tra xem dữ liệu trong hotel đã khác với dữ liệu ban đầu chưa
-      if (JSON.stringify(hotel) === JSON.stringify(oldData)) {
+      //kiểm tra xem dữ liệu trong room đã khác với dữ liệu ban đầu chưa
+      if (JSON.stringify(room) === JSON.stringify(oldData)) {
         return;
       }
 
-      const response = await HotelService.updateHotel(hotel);
+      const response = await HotelService.updateBasicRoom(hotelId, room);
       if (response?.status === 200) {
-        alert(
-          `Cập nhật khách sạn thành công, mã hotel: ${response.data.hotelId}`
-        );
+        alert(`Cập nhật phòng thành công, mã phòng: ${response.data}`);
         setRefreshData((prev) => !prev);
       } else {
         alert("Có lỗi xảy ra(" + response?.message + ")");
@@ -329,15 +177,19 @@ const RoomUpdate = () => {
   const handleChangeAmenities = async () => {
     try {
       if (
-        JSON.stringify(hotel.amenities) === JSON.stringify(oldData.amenities)
+        JSON.stringify(room.roomAmenities) ===
+          JSON.stringify(oldData.roomAmenities) &&
+        JSON.stringify(room.preferential) ===
+          JSON.stringify(oldData.preferential)
       ) {
         return;
       }
-      const response = await HotelService.updateAmenitiesHotel(hotel);
+      const response = await HotelService.updateRoomamenitiesPreferential(
+        hotelId,
+        room
+      );
       if (response?.status === 200) {
-        alert(
-          `Cập nhật tiện nghi thành công, mã hotel: ${response.data.hotelId}`
-        );
+        alert(`Cập nhật tiện nghi thành công, mã hotel: ${response.data}`);
         setRefreshData((prev) => !prev);
       } else {
         alert("Có lỗi xảy ra(" + response?.message + ")");
@@ -350,27 +202,6 @@ const RoomUpdate = () => {
       }
     }
   };
-
-  //   const handleChangeDiscount = async () => {
-  //     try {
-  //       if (discount < 0 || discount > 60) {
-  //         alert("Giảm giá phải từ 0 đến 60");
-  //         return;
-  //       }
-  //       const data = {
-  //         hotelId: hotelId,
-  //         discount: discount,
-  //       };
-  //       const response = await HotelService.updateDiscountAllRoom(data);
-  //       if (response?.status === 200) {
-  //         alert("Cập nhật giảm giá thành công");
-  //         setRefreshData((prev) => !prev);
-  //         setDiscount(0);
-  //       }
-  //     } catch (error) {
-  //       console.error(error);
-  //     }
-  //   };
   return (
     <>
       <main className="flex-1">
@@ -415,7 +246,7 @@ const RoomUpdate = () => {
                         {/* giá */}
                         <div className="col-span-6 sm:col-span-3 lg:col-span-2">
                           <label
-                            htmlFor="hotline"
+                            htmlFor="pricePerNight"
                             className="block text-sm font-medium text-gray-700"
                           >
                             Giá ở 1 đêm (VND)
@@ -423,7 +254,7 @@ const RoomUpdate = () => {
                           <div className="mt-1">
                             <input
                               type="number"
-                              placeholder={errors.hotline}
+                              placeholder={errors.pricePerNight}
                               className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-red-400 focus:outline-none focus:ring-sky-500 focus:border-sky-500 sm:text-sm"
                               value={room.pricePerNight}
                               onChange={(e) =>
@@ -438,7 +269,7 @@ const RoomUpdate = () => {
                         {/* Khuyến mãi */}
                         <div className="col-span-6 sm:col-span-3 lg:col-span-1">
                           <label
-                            htmlFor="hotline"
+                            htmlFor="discount"
                             className="block text-sm font-medium text-gray-700"
                           >
                             Khuyến mãi %
@@ -446,7 +277,8 @@ const RoomUpdate = () => {
                           <div className="mt-1">
                             <input
                               type="number"
-                              placeholder={errors.hotline}
+                              min={0}
+                              placeholder={errors.discount}
                               className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-red-400 focus:outline-none focus:ring-sky-500 focus:border-sky-500 sm:text-sm"
                               value={room.discount}
                               onChange={(e) =>
@@ -513,7 +345,7 @@ const RoomUpdate = () => {
                         {/* Diện tích */}
                         <div className="col-span-6 sm:col-span-3 lg:col-span-1">
                           <label
-                            htmlFor="hotline"
+                            htmlFor="roomSize"
                             className="block text-sm font-medium text-gray-700"
                           >
                             Diện tích (m²)
@@ -521,13 +353,36 @@ const RoomUpdate = () => {
                           <div className="mt-1">
                             <input
                               type="number"
-                              placeholder={errors.hotline}
+                              placeholder={errors.roomSize}
                               className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-red-400 focus:outline-none focus:ring-sky-500 focus:border-sky-500 sm:text-sm"
                               value={room.roomSize}
                               onChange={(e) =>
                                 setRoom({
                                   ...room,
                                   roomSize: e.target.value,
+                                })
+                              }
+                            />
+                          </div>
+                        </div>
+                        {/* hướng */}
+                        <div className="col-span-6 sm:col-span-3 lg:col-span-3">
+                          <label
+                            htmlFor="view"
+                            className="block text-sm font-medium text-gray-700"
+                          >
+                            Hướng nhìn của phòng
+                          </label>
+                          <div className="mt-1">
+                            <input
+                              type="text"
+                              placeholder={errors.view}
+                              className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-red-400 focus:outline-none focus:ring-sky-500 focus:border-sky-500 sm:text-sm"
+                              value={room.view}
+                              onChange={(e) =>
+                                setRoom({
+                                  ...room,
+                                  view: e.target.value,
                                 })
                               }
                             />
@@ -595,7 +450,7 @@ const RoomUpdate = () => {
               <div className="lg:col-span-2 rounded-lg">
                 <div className="">
                   <div className="shadow overflow-hidden sm:rounded-md">
-                    {/* address */}
+                    {/* ảnh */}
                     <div className="px-4 py-5 bg-white sm:p-6 grid gap-3">
                       <h1 className="text-2xl font-semibold">Hình ảnh</h1>
                       {errors.image && (
@@ -604,6 +459,7 @@ const RoomUpdate = () => {
                       <div className="grid xl:grid-cols-6 gap-3">
                         <div className="xl:col-span-6 border border-solid h-52 rounded-lg">
                           <img
+                            ref={imgRef}
                             src={room.roomImage}
                             alt=""
                             className="object-cover h-52 w-full rounded-lg"
@@ -635,9 +491,9 @@ const RoomUpdate = () => {
             {/* Tiện nghi khách sạn */}
             <div className="mt-6 grid lg:grid-cols-6 gap-3 lg:gap-5 rounded-lg bg-white m-2">
               <h1 className="col-span-6 text-2xl font-semibold p-6">
-                Các tiện nghi của khách sạn
+                Các tiện nghi, ưu đãi của phòng
               </h1>
-              {/* Tiện nghi khách sạn cơ bản  */}
+              {/* Ưu đãi phòng  */}
               <div className="col-span-6 lg:col-span-2 rounded-lg m-2">
                 <div className="shadow overflow-hidden sm:rounded-md">
                   <div className="px-4 py-5 bg-white sm:p-6 grid gap-3">
@@ -647,7 +503,7 @@ const RoomUpdate = () => {
                           htmlFor="serviceName"
                           className="block text-sm font-medium text-gray-700"
                         >
-                          Tiện nghi khách sạn cơ bản
+                          Ưu đãi
                         </label>
                       </div>
                       <div className="xl:col-span-4">
@@ -655,15 +511,15 @@ const RoomUpdate = () => {
                           type="text"
                           className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-sky-500 focus:border-sky-500 sm:text-sm"
                           placeholder="Nhập tên dịch vụ"
-                          value={newAmenity.hotelAmenities}
+                          value={newAmenity.preferential}
                           onChange={(e) =>
                             setNewAmenity({
-                              hotelAmenities: e.target.value,
+                              preferential: e.target.value,
                             })
                           }
                         />
                         <span className="text-red-500 text-sm">
-                          {amenitiesError.hotelAmenities}
+                          {amenitiesError.preferential}
                         </span>
                       </div>
                     </div>
@@ -671,7 +527,7 @@ const RoomUpdate = () => {
                       <button
                         type="button"
                         className="xl:ml-auto inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-teal-600 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
-                        onClick={handleAddHotelAmenity}
+                        onClick={handleAddPreferential}
                       >
                         Thêm dịch vụ
                         <PlusIcon
@@ -682,37 +538,30 @@ const RoomUpdate = () => {
                     </div>
                     <div>
                       <ul className="list-disc list-inside">
-                        {/* {hotel.amenities?.hotelAmenities?.map(
-                          (service, index) => (
-                            <li key={index}>
-                              {service}
-                              <span
-                                className="text-red-500 cursor-pointer float-end"
-                                onClick={() => {
-                                  const updatedAmenities = [
-                                    ...hotel.amenities.hotelAmenities,
-                                  ];
-                                  updatedAmenities.splice(index, 1);
-                                  setHotel({
-                                    ...hotel,
-                                    amenities: {
-                                      ...hotel.amenities,
-                                      hotelAmenities: updatedAmenities,
-                                    },
-                                  });
-                                }}
-                              >
-                                (Xóa)
-                              </span>
-                            </li>
-                          )
-                        )} */}
+                        {room.preferential?.map((service, index) => (
+                          <li key={index}>
+                            {service}
+                            <span
+                              className="text-red-500 cursor-pointer float-end"
+                              onClick={() => {
+                                const updatedAmenities = [...room.preferential];
+                                updatedAmenities.splice(index, 1);
+                                setRoom({
+                                  ...room,
+                                  preferential: updatedAmenities,
+                                });
+                              }}
+                            >
+                              (Xóa)
+                            </span>
+                          </li>
+                        ))}
                       </ul>
                     </div>
                   </div>
                 </div>
               </div>
-              {/* Tiện nghi dịch vụ lễ tân  */}
+              {/* Phòng tắm và vật dụng phòng tắm  */}
               <div className="col-span-6 lg:col-span-2 rounded-lg m-2">
                 <div className="shadow overflow-hidden sm:rounded-md">
                   <div className="px-4 py-5 bg-white sm:p-6 grid gap-3">
@@ -722,7 +571,7 @@ const RoomUpdate = () => {
                           htmlFor="serviceName"
                           className="block text-sm font-medium text-gray-700"
                         >
-                          Tiện nghi dịch vụ lễ tân
+                          Phòng tắm và vật dụng phòng tắm
                         </label>
                       </div>
                       <div className="xl:col-span-4">
@@ -730,15 +579,15 @@ const RoomUpdate = () => {
                           type="text"
                           className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-sky-500 focus:border-sky-500 sm:text-sm"
                           placeholder="Nhập tên dịch vụ"
-                          value={newAmenity.frontDeskServices}
+                          value={newAmenity.bathroom}
                           onChange={(e) =>
                             setNewAmenity({
-                              frontDeskServices: e.target.value,
+                              bathroom: e.target.value,
                             })
                           }
                         />
                         <span className="text-red-500 text-sm">
-                          {amenitiesError.frontDeskServices}
+                          {amenitiesError.bathroom}
                         </span>
                       </div>
                     </div>
@@ -746,7 +595,7 @@ const RoomUpdate = () => {
                       <button
                         type="button"
                         className="xl:ml-auto inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-teal-600 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
-                        onClick={handleAddFrontDeskService}
+                        onClick={handleAddRoomAmenities("bathroom")}
                       >
                         Thêm dịch vụ
                         <PlusIcon
@@ -757,37 +606,35 @@ const RoomUpdate = () => {
                     </div>
                     <div>
                       <ul className="list-disc list-inside">
-                        {/* {hotel.amenities?.frontDeskServices?.map(
-                          (service, index) => (
-                            <li key={index}>
-                              {service}
-                              <span
-                                className="text-red-500 cursor-pointer float-end"
-                                onClick={() => {
-                                  const updatedAmenities = [
-                                    ...hotel.amenities.frontDeskServices,
-                                  ];
-                                  updatedAmenities.splice(index, 1);
-                                  setHotel({
-                                    ...hotel,
-                                    amenities: {
-                                      ...hotel.amenities,
-                                      frontDeskServices: updatedAmenities,
-                                    },
-                                  });
-                                }}
-                              >
-                                (Xóa)
-                              </span>
-                            </li>
-                          )
-                        )} */}
+                        {room.roomAmenities?.bathroom?.map((service, index) => (
+                          <li key={index}>
+                            {service}
+                            <span
+                              className="text-red-500 cursor-pointer float-end"
+                              onClick={() => {
+                                const updatedAmenities = [
+                                  ...room.roomAmenities.bathroom,
+                                ];
+                                updatedAmenities.splice(index, 1);
+                                setRoom({
+                                  ...room,
+                                  roomAmenities: {
+                                    ...room.roomAmenities,
+                                    bathroom: updatedAmenities,
+                                  },
+                                });
+                              }}
+                            >
+                              (Xóa)
+                            </span>
+                          </li>
+                        ))}
                       </ul>
                     </div>
                   </div>
                 </div>
               </div>
-              {/* Dịch vụ dọn dẹp  */}
+              {/* Vật dụng an toàn, an ninh */}
               <div className="col-span-6 lg:col-span-2 rounded-lg m-2">
                 <div className="shadow overflow-hidden sm:rounded-md">
                   <div className="px-4 py-5 bg-white sm:p-6 grid gap-3">
@@ -797,7 +644,7 @@ const RoomUpdate = () => {
                           htmlFor="serviceName"
                           className="block text-sm font-medium text-gray-700"
                         >
-                          Dịch vụ dọn dẹp
+                          Vật dụng an toàn, an ninh
                         </label>
                       </div>
                       <div className="xl:col-span-4">
@@ -805,15 +652,15 @@ const RoomUpdate = () => {
                           type="text"
                           className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-sky-500 focus:border-sky-500 sm:text-sm"
                           placeholder="Nhập tên dịch vụ"
-                          value={newAmenity.cleaningServices}
+                          value={newAmenity.safety}
                           onChange={(e) =>
                             setNewAmenity({
-                              cleaningServices: e.target.value,
+                              safety: e.target.value,
                             })
                           }
                         />
                         <span className="text-red-500 text-sm">
-                          {amenitiesError.cleaningServices}
+                          {amenitiesError.safety}
                         </span>
                       </div>
                     </div>
@@ -821,7 +668,7 @@ const RoomUpdate = () => {
                       <button
                         type="button"
                         className="xl:ml-auto inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-teal-600 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
-                        onClick={handleAddCleaningService}
+                        onClick={handleAddRoomAmenities("safety")}
                       >
                         Thêm dịch vụ
                         <PlusIcon
@@ -832,31 +679,29 @@ const RoomUpdate = () => {
                     </div>
                     <div>
                       <ul className="list-disc list-inside">
-                        {/* {hotel.amenities?.cleaningServices?.map(
-                          (service, index) => (
-                            <li key={index}>
-                              {service}
-                              <span
-                                className="text-red-500 cursor-pointer float-end"
-                                onClick={() => {
-                                  const updatedAmenities = [
-                                    ...hotel.amenities.cleaningServices,
-                                  ];
-                                  updatedAmenities.splice(index, 1);
-                                  setHotel({
-                                    ...hotel,
-                                    amenities: {
-                                      ...hotel.amenities,
-                                      cleaningServices: updatedAmenities,
-                                    },
-                                  });
-                                }}
-                              >
-                                (Xóa)
-                              </span>
-                            </li>
-                          )
-                        )} */}
+                        {room.roomAmenities?.safety?.map((service, index) => (
+                          <li key={index}>
+                            {service}
+                            <span
+                              className="text-red-500 cursor-pointer float-end"
+                              onClick={() => {
+                                const updatedAmenities = [
+                                  ...room.roomAmenities.safety,
+                                ];
+                                updatedAmenities.splice(index, 1);
+                                setRoom({
+                                  ...room,
+                                  roomAmenities: {
+                                    ...room.roomAmenities,
+                                    safety: updatedAmenities,
+                                  },
+                                });
+                              }}
+                            >
+                              (Xóa)
+                            </span>
+                          </li>
+                        ))}
                       </ul>
                     </div>
                   </div>
@@ -872,7 +717,7 @@ const RoomUpdate = () => {
                           htmlFor="serviceName"
                           className="block text-sm font-medium text-gray-700"
                         >
-                          Tiện nghi vui chơi giải trí
+                          Vui chơi giải trí
                         </label>
                       </div>
                       <div className="xl:col-span-4">
@@ -880,15 +725,15 @@ const RoomUpdate = () => {
                           type="text"
                           className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-sky-500 focus:border-sky-500 sm:text-sm"
                           placeholder="Nhập tên dịch vụ"
-                          value={newAmenity.entertainmentAndRecreation}
+                          value={newAmenity.entertainment}
                           onChange={(e) =>
                             setNewAmenity({
-                              entertainmentAndRecreation: e.target.value,
+                              entertainment: e.target.value,
                             })
                           }
                         />
                         <span className="text-red-500 text-sm">
-                          {amenitiesError.entertainmentAndRecreation}
+                          {amenitiesError.entertainment}
                         </span>
                       </div>
                     </div>
@@ -896,7 +741,7 @@ const RoomUpdate = () => {
                       <button
                         type="button"
                         className="xl:ml-auto inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-teal-600 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
-                        onClick={handleAddEntertainmentService}
+                        onClick={handleAddRoomAmenities("entertainment")}
                       >
                         Thêm dịch vụ
                         <PlusIcon
@@ -907,7 +752,7 @@ const RoomUpdate = () => {
                     </div>
                     <div>
                       <ul className="list-disc list-inside">
-                        {/* {hotel.amenities?.entertainmentAndRecreation?.map(
+                        {room.roomAmenities?.entertainment?.map(
                           (service, index) => (
                             <li key={index}>
                               {service}
@@ -915,16 +760,14 @@ const RoomUpdate = () => {
                                 className="text-red-500 cursor-pointer float-end"
                                 onClick={() => {
                                   const updatedAmenities = [
-                                    ...hotel.amenities
-                                      .entertainmentAndRecreation,
+                                    ...room.roomAmenities.entertainment,
                                   ];
                                   updatedAmenities.splice(index, 1);
-                                  setHotel({
-                                    ...hotel,
-                                    amenities: {
-                                      ...hotel.amenities,
-                                      entertainmentAndRecreation:
-                                        updatedAmenities,
+                                  setRoom({
+                                    ...room,
+                                    roomAmenities: {
+                                      ...room.roomAmenities,
+                                      entertainment: updatedAmenities,
                                     },
                                   });
                                 }}
@@ -933,13 +776,13 @@ const RoomUpdate = () => {
                               </span>
                             </li>
                           )
-                        )} */}
+                        )}
                       </ul>
                     </div>
                   </div>
                 </div>
               </div>
-              {/* Tiện nghi ngoài trời  */}
+              {/* Ăn uống  */}
               <div className="col-span-6 lg:col-span-2 rounded-lg m-2">
                 <div className="shadow overflow-hidden sm:rounded-md">
                   <div className="px-4 py-5 bg-white sm:p-6 grid gap-3">
@@ -949,7 +792,7 @@ const RoomUpdate = () => {
                           htmlFor="serviceName"
                           className="block text-sm font-medium text-gray-700"
                         >
-                          Tiện nghi ngoài trời
+                          Ăn uống
                         </label>
                       </div>
                       <div className="xl:col-span-4">
@@ -957,15 +800,15 @@ const RoomUpdate = () => {
                           type="text"
                           className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-sky-500 focus:border-sky-500 sm:text-sm"
                           placeholder="Nhập tên dịch vụ"
-                          value={newAmenity.outdoor}
+                          value={newAmenity.foodAndBeverage}
                           onChange={(e) =>
                             setNewAmenity({
-                              outdoor: e.target.value,
+                              foodAndBeverage: e.target.value,
                             })
                           }
                         />
                         <span className="text-red-500 text-sm">
-                          {amenitiesError.outdoor}
+                          {amenitiesError.foodAndBeverage}
                         </span>
                       </div>
                     </div>
@@ -973,7 +816,7 @@ const RoomUpdate = () => {
                       <button
                         type="button"
                         className="xl:ml-auto inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-teal-600 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
-                        onClick={handleAddOutdoorService}
+                        onClick={handleAddRoomAmenities("foodAndBeverage")}
                       >
                         Thêm dịch vụ
                         <PlusIcon
@@ -984,35 +827,37 @@ const RoomUpdate = () => {
                     </div>
                     <div>
                       <ul className="list-disc list-inside">
-                        {/* {hotel.amenities?.outdoor?.map((service, index) => (
-                          <li key={index}>
-                            {service}
-                            <span
-                              className="text-red-500 cursor-pointer float-end"
-                              onClick={() => {
-                                const updatedAmenities = [
-                                  ...hotel.amenities.outdoor,
-                                ];
-                                updatedAmenities.splice(index, 1);
-                                setHotel({
-                                  ...hotel,
-                                  amenities: {
-                                    ...hotel.amenities,
-                                    outdoor: updatedAmenities,
-                                  },
-                                });
-                              }}
-                            >
-                              (Xóa)
-                            </span>
-                          </li>
-                        ))} */}
+                        {room.roomAmenities?.foodAndBeverage?.map(
+                          (service, index) => (
+                            <li key={index}>
+                              {service}
+                              <span
+                                className="text-red-500 cursor-pointer float-end"
+                                onClick={() => {
+                                  const updatedAmenities = [
+                                    ...room.roomAmenities.foodAndBeverage,
+                                  ];
+                                  updatedAmenities.splice(index, 1);
+                                  setRoom({
+                                    ...room,
+                                    roomAmenities: {
+                                      ...room.roomAmenities,
+                                      foodAndBeverage: updatedAmenities,
+                                    },
+                                  });
+                                }}
+                              >
+                                (Xóa)
+                              </span>
+                            </li>
+                          )
+                        )}
                       </ul>
                     </div>
                   </div>
                 </div>
               </div>
-              {/* Tiện nghi di chuyển  */}
+              {/* Bố trí, nội thất  */}
               <div className="col-span-6 lg:col-span-2 rounded-lg m-2">
                 <div className="shadow overflow-hidden sm:rounded-md">
                   <div className="px-4 py-5 bg-white sm:p-6 grid gap-3">
@@ -1022,7 +867,7 @@ const RoomUpdate = () => {
                           htmlFor="serviceName"
                           className="block text-sm font-medium text-gray-700"
                         >
-                          Tiện nghi di chuyển
+                          Bố trí, nội thất
                         </label>
                       </div>
                       <div className="xl:col-span-4">
@@ -1030,15 +875,15 @@ const RoomUpdate = () => {
                           type="text"
                           className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-sky-500 focus:border-sky-500 sm:text-sm"
                           placeholder="Nhập tên dịch vụ"
-                          value={newAmenity.transportation}
+                          value={newAmenity.furniture}
                           onChange={(e) =>
                             setNewAmenity({
-                              transportation: e.target.value,
+                              furniture: e.target.value,
                             })
                           }
                         />
                         <span className="text-red-500 text-sm">
-                          {amenitiesError.transportation}
+                          {amenitiesError.furniture}
                         </span>
                       </div>
                     </div>
@@ -1046,7 +891,7 @@ const RoomUpdate = () => {
                       <button
                         type="button"
                         className="xl:ml-auto inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-teal-600 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
-                        onClick={handleAddTransportationService}
+                        onClick={handleAddRoomAmenities("furniture")}
                       >
                         Thêm dịch vụ
                         <PlusIcon
@@ -1057,7 +902,7 @@ const RoomUpdate = () => {
                     </div>
                     <div>
                       <ul className="list-disc list-inside">
-                        {/* {hotel.amenities?.transportation?.map(
+                        {room.roomAmenities?.furniture?.map(
                           (service, index) => (
                             <li key={index}>
                               {service}
@@ -1065,14 +910,14 @@ const RoomUpdate = () => {
                                 className="text-red-500 cursor-pointer float-end"
                                 onClick={() => {
                                   const updatedAmenities = [
-                                    ...hotel.amenities.transportation,
+                                    ...room.roomAmenities.furniture,
                                   ];
                                   updatedAmenities.splice(index, 1);
-                                  setHotel({
-                                    ...hotel,
-                                    amenities: {
-                                      ...hotel.amenities,
-                                      transportation: updatedAmenities,
+                                  setRoom({
+                                    ...room,
+                                    roomAmenities: {
+                                      ...room.roomAmenities,
+                                      furniture: updatedAmenities,
                                     },
                                   });
                                 }}
@@ -1081,7 +926,7 @@ const RoomUpdate = () => {
                               </span>
                             </li>
                           )
-                        )} */}
+                        )}
                       </ul>
                     </div>
                   </div>
