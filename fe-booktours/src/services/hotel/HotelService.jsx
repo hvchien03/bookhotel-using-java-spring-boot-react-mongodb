@@ -167,8 +167,69 @@ export default class HotelService {
     console.log(hotelId, room);
     try {
       const response = await axios.put(
-        this.ADMIN_URL + `/${hotelId}/update-roomamenities-preferential/${room.roomId}`,
+        this.ADMIN_URL +
+          `/${hotelId}/update-roomamenities-preferential/${room.roomId}`,
         room,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  }
+  //lấy danh sách booking theo status
+  static async getBookingByStatus(status, objectQuery) {
+    try {
+      if(status === ""){
+        status = "Đang chờ xác nhận";
+      }
+      let page = objectQuery.page - 1;
+      const response = await axios.get(
+        this.ADMIN_URL +
+          `/booking/status/${status.replace(/ /g, "%20")}?page=${page}&limit=${
+            objectQuery.limit
+          }`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  }
+  //xác nhận booking
+  static async confirmBooking(bookingCode) {
+    try {
+      const response = await axios.put(
+        this.ADMIN_URL + `/booking/confirmbooking/${bookingCode}`,
+        {},
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  //tìm kiếm booking theo mã booking
+  static async searchBooking(bookingCode) {
+    try {
+      const response = await axios.get(
+        this.ADMIN_URL + `/booking/code/${bookingCode}`,
         {
           headers: {
             "Content-Type": "application/json",

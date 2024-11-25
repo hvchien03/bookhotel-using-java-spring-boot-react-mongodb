@@ -6,6 +6,8 @@ import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -45,7 +47,6 @@ public class BookingHistoryService {
         return response;
     }
 
-    // chưa test
     // đặt phòng
     public MyResponse<String> bookHotel(String hotelId, BookHotelRequest inputBooking) {
         MyResponse<String> response = new MyResponse<>();
@@ -83,7 +84,8 @@ public class BookingHistoryService {
         bookingHistory.setCheckIn(inputBooking.getCheckIn());
 
         // Cộng ngayf
-        Date checkOut = new Date(inputBooking.getCheckIn().getTime() + inputBooking.getDuration() * 24 * 60 * 60 * 1000);
+        Date checkOut = new Date(
+                inputBooking.getCheckIn().getTime() + inputBooking.getDuration() * 24 * 60 * 60 * 1000);
 
         bookingHistory.setCheckOut(checkOut);
 
@@ -141,12 +143,14 @@ public class BookingHistoryService {
     }
 
     // lấy tất cả đơn đặt phòng của tất cả khách sạn theo status
-    public MyResponse<List<BookingHistory>> getBookingByStatus(String status) {
-        MyResponse<List<BookingHistory>> response = new MyResponse<>();
+    public MyResponse<Page<BookingHistory>> getBookingByStatus(String status, int page, int limit) {
+        MyResponse<Page<BookingHistory>> response = new MyResponse<>();
+
+        PageRequest pageable = PageRequest.of(page, limit);
 
         // lấy danh sách đơn đặt phòng bằng ngày nhận phòng, status
-        List<BookingHistory> bookHotels = bookingHistoryRepository.findByStatusIgnoreCase(status);
-        if (bookHotels.size() == 0) {
+        Page<BookingHistory> bookHotels = bookingHistoryRepository.findByStatusIgnoreCase(status, pageable);
+        if (bookHotels.isEmpty()) {
             response.setStatus(404);
             response.setMessage("Không tìm thấy đơn đặt phòng");
         } else {
@@ -189,6 +193,24 @@ public class BookingHistoryService {
             response.setStatus(200);
             response.setMessage("Xác nhận đơn đặt phòng thành công, mã đặt phòng: " + bookingCode);
             response.setData(bookingCode);
+        }
+        return response;
+    }
+
+    // tìm đơn đặt theo bookingcode
+    public MyResponse<BookingHistory> getBookingByBookingCode(String bookingCode) {
+        MyResponse<BookingHistory> response = new MyResponse<>();
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
+        // lấy danh sách booking của khách hàng
+        BookingHistory bookingHistory = bookingHistoryRepository.findByBookingCode(bookingCode);
+        if (bookingHistory == null) {
+            response.setStatus(404);
+            response.setMessage("Không tìm thấy lịch sử đặt phòng");
+        } else {
+            response.setStatus(200);
+            response.setMessage("Lịch sử đặt phòng của khách hàng " + auth.getName());
+            response.setData(bookingHistory);
         }
         return response;
     }

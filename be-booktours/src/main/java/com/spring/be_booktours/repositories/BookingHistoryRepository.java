@@ -2,6 +2,8 @@ package com.spring.be_booktours.repositories;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
@@ -16,8 +18,8 @@ public interface BookingHistoryRepository extends MongoRepository<BookingHistory
 
     List<BookingHistory> findByHotelId(String hotelId);
 
-    //tìm danh sách đặt theo status không phân biệt chữ hoa chữ thường
-    List<BookingHistory> findByStatusIgnoreCase(String status);
+    //lấy danh sách đặt phòng theo status và có phân trang
+    Page<BookingHistory> findByStatusIgnoreCase(String status, Pageable pageable);
 
     BookingHistory findByBookingCode(String bookingCode);
 }

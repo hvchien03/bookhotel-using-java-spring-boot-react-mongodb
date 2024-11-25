@@ -98,6 +98,14 @@ const HotelManagement = () => {
                       />
                       Phục hồi
                     </button>
+                    <Link to="/admin/hotel-booking">
+                      <button
+                        type="button"
+                        className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-sky-600 hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sky-500"
+                      >
+                        Danh sách đặt khách sạn
+                      </button>
+                    </Link>
                   </div>
                   <div className="ml-auto md:flex gap-3">
                     <div className="my-auto">

@@ -34,6 +34,7 @@ import HotelManagement from "./pages/admin/hotel/HotelManager";
 import HotelCreate from "./pages/admin/hotel/HotelCreate";
 import HotelUpdate from "./pages/admin/hotel/HotelUpdate";
 import RoomUpdate from "./pages/admin/hotel/RoomUpdate";
+import HotelBooking from "./pages/admin/hotel/HotelBooking";
 
 function App() {
   const context = useContext(GlobalContext);
@@ -50,9 +51,18 @@ function App() {
         <Route path="/tours" element={<Tours />} />
         <Route
           path="/tour-detail/:tourId"
-          element={<TourDetail roles={context?.roles} isAuthenticated={context.isAuthenticated} verifiedEmail={context.profile?.verifiedEmail} />}
+          element={
+            <TourDetail
+              roles={context?.roles}
+              isAuthenticated={context.isAuthenticated}
+              verifiedEmail={context.profile?.verifiedEmail}
+            />
+          }
         />
-        <Route path="/detail-airport-transfer/:airportTransferId" element={<DetailAirportTransfer />} />
+        <Route
+          path="/detail-airport-transfer/:airportTransferId"
+          element={<DetailAirportTransfer />}
+        />
 
         {/* Phải xác nhận email mới xem được */}
         {!context.profile?.verifiedEmail && (
@@ -73,7 +83,7 @@ function App() {
         {/* Chưa đăng nhập */}
         {!context.isAuthenticated && (
           <>
-            <Route path="/login" element={<Login/>} />
+            <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
           </>
         )}
@@ -92,17 +102,36 @@ function App() {
           {/* Hotel */}
           <Route path="/admin/hotel-management" element={<HotelManagement />} />
           <Route path="/admin/hotel-create" element={<HotelCreate />} />
-          <Route path="/admin/hotel-update/:hotelId" element={<HotelUpdate />} />
-          <Route path="/admin/hotel/:hotelId/room-update/:roomId" element={<RoomUpdate />} />
+          <Route
+            path="/admin/hotel-update/:hotelId"
+            element={<HotelUpdate />}
+          />
+          <Route
+            path="/admin/hotel/:hotelId/room-update/:roomId"
+            element={<RoomUpdate />}
+          />
+          <Route path="/admin/hotel-booking" element={<HotelBooking />} />
           {/* User */}
           <Route path="/admin/user-management" element={<UserManagement />} />
           {/* Discount */}
-          <Route path="/admin/discount-management" element={<DiscountManager />} />
+          <Route
+            path="/admin/discount-management"
+            element={<DiscountManager />}
+          />
           <Route path="/admin/discount-create" element={<DiscountCreate />} />
           {/* AirportTransfer */}
-          <Route path="/admin/airport-transfer-management" element={<AirportTransferManager />} />
-          <Route path="/admin/airport-transfer-edit/:airportTransferId" element={<AirportTransferEdit />} />
-          <Route path="/admin/book-ride/:airportTransferId" element={<AirportTransferEdit />} />
+          <Route
+            path="/admin/airport-transfer-management"
+            element={<AirportTransferManager />}
+          />
+          <Route
+            path="/admin/airport-transfer-edit/:airportTransferId"
+            element={<AirportTransferEdit />}
+          />
+          <Route
+            path="/admin/book-ride/:airportTransferId"
+            element={<AirportTransferEdit />}
+          />
         </Route>
       )}
 
