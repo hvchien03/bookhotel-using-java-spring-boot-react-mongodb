@@ -183,17 +183,15 @@ export default class HotelService {
     }
   }
   //lấy danh sách booking theo status
-  static async getBookingByStatus(status, objectQuery) {
+  static async getBookingByStatus(statusCode, objectQuery) {
     try {
-      if(status === ""){
-        status = "Đang chờ xác nhận";
+      if (statusCode == null) {
+        statusCode = 1;
       }
       let page = objectQuery.page - 1;
       const response = await axios.get(
         this.ADMIN_URL +
-          `/booking/status/${status.replace(/ /g, "%20")}?page=${page}&limit=${
-            objectQuery.limit
-          }`,
+          `/booking/status/${statusCode}?page=${page}&limit=${objectQuery.limit}`,
         {
           headers: {
             "Content-Type": "application/json",

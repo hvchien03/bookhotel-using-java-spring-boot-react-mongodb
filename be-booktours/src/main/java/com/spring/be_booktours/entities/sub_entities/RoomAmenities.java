@@ -2,8 +2,6 @@ package com.spring.be_booktours.entities.sub_entities;
 
 
 import java.util.Set;
-
-import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

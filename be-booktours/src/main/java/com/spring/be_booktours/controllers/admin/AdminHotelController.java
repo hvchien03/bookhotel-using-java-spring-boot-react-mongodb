@@ -1,7 +1,5 @@
 package com.spring.be_booktours.controllers.admin;
 
-import java.util.Set;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -14,7 +12,7 @@ import com.spring.be_booktours.dtos.hotel.HotelRequest;
 import com.spring.be_booktours.dtos.hotel.RoomAmenitiesPreferentialRequest;
 import com.spring.be_booktours.dtos.hotel.RoomRequest;
 import com.spring.be_booktours.entities.sub_entities.HotelAmenities;
-import com.spring.be_booktours.entities.sub_entities.RoomAmenities;
+// import com.spring.be_booktours.entities.hotel_entities.sub_entities.RoomAmenities;
 import com.spring.be_booktours.services.HotelService;
 
 import jakarta.validation.Valid;

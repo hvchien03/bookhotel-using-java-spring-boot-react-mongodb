@@ -16,7 +16,9 @@ import com.spring.be_booktours.dtos.MyResponse;
 import com.spring.be_booktours.dtos.hotel.BookHotelRequest;
 import com.spring.be_booktours.entities.BookingHistory;
 import com.spring.be_booktours.entities.Hotel;
+import com.spring.be_booktours.entities.sub_entities.Payment;
 import com.spring.be_booktours.entities.sub_entities.Room;
+import com.spring.be_booktours.entities.sub_entities.Status;
 import com.spring.be_booktours.repositories.BookingHistoryRepository;
 import com.spring.be_booktours.repositories.HotelRepository;
 
@@ -92,8 +94,13 @@ public class BookingHistoryService {
         bookingHistory.setSpecialRequest(inputBooking.getSpecialRequest());
         bookingHistory.setEmailUser(auth.getName());
         bookingHistory.setTotal(total);
-        bookingHistory.setPaymentStatus("Chưa thanh toán");
-        bookingHistory.setStatus("Đang chờ xác nhận");
+        bookingHistory.setPayment(null);
+        //trạng thái đặt phòng
+        Status status = new Status();
+        status.setStatusCode(1);
+        status.setStatusName("Đang chờ xác nhận");
+        bookingHistory.setStatus(status);
+
         bookingHistoryRepository.save(bookingHistory);
 
         response.setStatus(200);
@@ -115,7 +122,10 @@ public class BookingHistoryService {
             response.setStatus(404);
             response.setMessage("Huỷ không thành công");
         } else {
-            bookingHistory.setStatus("Chờ xác nhận huỷ phòng");
+            Status status = new Status();
+            status.setStatusCode(2);
+            status.setStatusName("Chờ xác nhận huỷ phòng");
+            bookingHistory.setStatus(status);
             bookingHistoryRepository.save(bookingHistory);
             response.setStatus(200);
             response.setMessage("Đang chờ xác nhận huỷ đặt phòng, mã đặt phòng: " + bookingCode);
@@ -143,19 +153,19 @@ public class BookingHistoryService {
     }
 
     // lấy tất cả đơn đặt phòng của tất cả khách sạn theo status
-    public MyResponse<Page<BookingHistory>> getBookingByStatus(String status, int page, int limit) {
+    public MyResponse<Page<BookingHistory>> getBookingByStatus(int statusCode, int page, int limit) {
         MyResponse<Page<BookingHistory>> response = new MyResponse<>();
 
         PageRequest pageable = PageRequest.of(page, limit);
 
         // lấy danh sách đơn đặt phòng bằng ngày nhận phòng, status
-        Page<BookingHistory> bookHotels = bookingHistoryRepository.findByStatusIgnoreCase(status, pageable);
+        Page<BookingHistory> bookHotels = bookingHistoryRepository.findByStatus_StatusCode(statusCode, pageable);
         if (bookHotels.isEmpty()) {
             response.setStatus(404);
             response.setMessage("Không tìm thấy đơn đặt phòng");
         } else {
             response.setStatus(200);
-            response.setMessage("Danh sách đơn đặt phòng theo status " + status);
+            response.setMessage("Danh sách đơn đặt phòng theo trạng thái");
             response.setData(bookHotels);
         }
         return response;
@@ -170,7 +180,11 @@ public class BookingHistoryService {
             response.setStatus(404);
             response.setMessage("Không tìm thấy đơn đặt phòng");
         } else {
-            bookingHistory.setStatus("Đã huỷ");
+            Status status = new Status();
+            status.setStatusCode(4);
+            status.setStatusName("Đã huỷ");
+
+            bookingHistory.setStatus(status);
             bookingHistoryRepository.save(bookingHistory);
             response.setStatus(200);
             response.setMessage("Xác nhận huỷ đơn đặt phòng thành công, mã đặt phòng: " + bookingCode);
@@ -179,7 +193,31 @@ public class BookingHistoryService {
         return response;
     }
 
-    // xác nhận đơn đặt phòng cho user
+    // xác nhận đã thanh toán
+    public MyResponse<String> confirmationPaymentCode(String bookingCode, String confirmationPaymentCode) {
+        MyResponse<String> response = new MyResponse<>();
+        BookingHistory bookingHistory = bookingHistoryRepository.findByBookingCode(bookingCode);
+        if (bookingHistory == null) {
+            response.setStatus(404);
+            response.setMessage("Không tìm thấy đơn đặt phòng");
+        } else {
+            Payment payment = new Payment();
+            payment.setPaymentId("Payment" + System.currentTimeMillis());
+            payment.setPaymentDate(new Date());
+            payment.setPaymentAmount(bookingHistory.getTotal().toString());
+            payment.setPaymentMethod("Thanh toán trực tuyến");
+            payment.setPaymentStatus("Đã thanh toán");
+            payment.setConfirmationPaymentCode(confirmationPaymentCode);
+            bookingHistory.setPayment(payment);
+            bookingHistoryRepository.save(bookingHistory);
+            response.setStatus(200);
+            response.setMessage("Xác nhận mã thanh toán thành công, mã đặt phòng: " + bookingCode);
+            response.setData(bookingCode);
+        }
+        return response;
+    }
+
+    // xác nhận đơn đặt phòng cho user (phải xác nhận đã thanh toán mới được xác nhận đơn)
     public MyResponse<String> confirmBooking(String bookingCode) {
         MyResponse<String> response = new MyResponse<>();
         BookingHistory bookingHistory = bookingHistoryRepository.findByBookingCode(bookingCode);
@@ -187,8 +225,10 @@ public class BookingHistoryService {
             response.setStatus(404);
             response.setMessage("Không tìm thấy đơn đặt phòng");
         } else {
-            bookingHistory.setPaymentStatus("Đã thanh toán");
-            bookingHistory.setStatus("Đã xác nhận");
+            Status status = new Status();
+            status.setStatusCode(3);
+            status.setStatusName("Đã xác nhận");
+            bookingHistory.setStatus(status);
             bookingHistoryRepository.save(bookingHistory);
             response.setStatus(200);
             response.setMessage("Xác nhận đơn đặt phòng thành công, mã đặt phòng: " + bookingCode);

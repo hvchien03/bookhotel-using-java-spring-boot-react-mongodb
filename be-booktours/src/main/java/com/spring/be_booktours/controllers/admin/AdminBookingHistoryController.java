@@ -32,11 +32,11 @@ public class AdminBookingHistoryController {
     }
 
     // lấy danh sách đơn đặt theo status
-    @GetMapping("/booking/status/{status}")
-    public ResponseEntity<?> getBookingByStatus(@PathVariable String status,
+    @GetMapping("/booking/status/{statusCode}")
+    public ResponseEntity<?> getBookingByStatus(@PathVariable int statusCode,
             @RequestParam(defaultValue = "0", required = false) int page,
             @RequestParam(defaultValue = "5", required = false) int limit) {
-        return ResponseEntity.ok(bookingHistoryService.getBookingByStatus(status, page, limit));
+        return ResponseEntity.ok(bookingHistoryService.getBookingByStatus(statusCode, page, limit));
     }
 
     // xác nhận huỷ đơn đặt của khách hàng
@@ -49,5 +49,11 @@ public class AdminBookingHistoryController {
     @PutMapping("/booking/confirmbooking/{bookingCode}")
     public ResponseEntity<?> confirmBooking(@PathVariable String bookingCode) {
         return ResponseEntity.ok(bookingHistoryService.confirmBooking(bookingCode));
+    }
+
+    //thanh toán
+    @PutMapping("/booking/payment/{bookingCode}")
+    public ResponseEntity<?> paymentBooking(@PathVariable String bookingCode, @RequestParam String paymentCode) {
+        return ResponseEntity.ok(bookingHistoryService.confirmationPaymentCode(bookingCode, paymentCode));
     }
 }

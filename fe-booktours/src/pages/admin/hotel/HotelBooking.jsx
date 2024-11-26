@@ -1,7 +1,7 @@
-import React, { useNavigate, useRef, useEffect, useState } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import Pagination from "../../../components/admin/Pagination";
-import { Link, useParams } from "react-router-dom";
-import TourService from "../../../services/TourService";
+// import { Link, useParams } from "react-router-dom";
+// import TourService from "../../../services/TourService";
 import formatDateYYYYMMDD from "../../../utils/format-date-yyyymmdd";
 import formatPrice from "../../../utils/format-price";
 import { CSVLink } from "react-csv";
@@ -14,9 +14,9 @@ const HotelBooking = () => {
   const cancelButtonRef = useRef();
   const [open, setOpen] = useState(false);
   const [bookHotel, setBookHotel] = useState([]);
-  const [bookingStatus, setBookingStatus] = useState("");
+  const [bookingStatus, setBookingStatus] = useState();
   const [selectedViewDetail, setSelectedViewDetail] = useState({});
-  const [search, setSearch] = useState("");
+  // const [search, setSearch] = useState("");
   const [objectQuery, setObjectQuery] = useState({
     page: 1,
     limit: 10,
@@ -48,14 +48,8 @@ const HotelBooking = () => {
     fetchBooking();
   }, [bookingStatus, objectQuery]);
 
-  // useEffect(() => {
-  //   const filterBookTours = tour.bookTours?.filter(
-  //     (bookTour) =>
-  //       bookTour.departureDate === departureDate &&
-  //       bookTour.confirmed === (tourStatus === "Đã xác nhận" ? true : false)
-  //   );
-  //   setBookTours(filterBookTours);
-  // }, [departureDate, tourStatus]);
+
+
   const handleShowViewDetailBooking = (bookHotel) => () => {
     setSelectedViewDetail(bookHotel);
     setOpen(true);
@@ -157,7 +151,7 @@ const HotelBooking = () => {
                           //   alert("Đơn đặt không tồn tại");
                           // }}
                         >
-                          Search
+                          Tìm kiếm
                         </button>
                       </div>
                     </div>
@@ -182,10 +176,8 @@ const HotelBooking = () => {
                         value={bookingStatus}
                         onChange={(e) => setBookingStatus(e.target.value)}
                       >
-                        <option value="đang chờ xác nhận">
-                          Đang chờ xác nhận
-                        </option>
-                        <option value="đã xác nhận">Đã xác nhận</option>
+                        <option value="1">Đang chờ xác nhận</option>
+                        <option value="3">Đã xác nhận</option>
                       </select>
                     </div>
                   </div>
@@ -297,31 +289,32 @@ const HotelBooking = () => {
                                     />
                                   </svg>
                                 </td>
-                                <td className="px-4 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                  <select
-                                    className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-sky-500 focus:border-sky-500 sm:text-sm"
-                                    value={
-                                      bookHotel.status == "Đã xác nhận"
-                                        ? "Đã xác nhận"
-                                        : "Đang chờ xác nhận"
-                                    }
-                                    onChange={async (e) => {
-                                      if (e.target.value === "Đã xác nhận") {
-                                        const response =
-                                          await HotelService.confirmBooking(
-                                            bookHotel.bookingCode
-                                          );
-                                      }
-                                      // cập nhật lại trạng thái
-                                    }}
-                                  >
-                                    <option value="Đã xác nhận">
-                                      Đã xác nhận
-                                    </option>
-                                    <option value="Đang chờ xác nhận">
-                                      Chưa xác nhận
-                                    </option>
-                                  </select>
+                                <td className="px-4 py-4 whitespace-nowrap text-right text-sm font-medium flex justify-center">
+                                  {!bookHotel.confirmed ? (
+                                    <input
+                                      type="checkbox"
+                                      className="focus:ring-sky-500 h-4 w-4 text-sky-600 border-gray-300 rounded"
+                                      checked={bookHotel.confirmed}
+                                      //onChange={handleConfirmBooking}
+                                    />
+                                  ) : (
+                                    <div className="text-gray-500">
+                                      <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                        strokeWidth={1.5}
+                                        stroke="green"
+                                        className="size-6"
+                                      >
+                                        <path
+                                          strokeLinecap="round"
+                                          strokeLinejoin="round"
+                                          d="m4.5 12.75 6 6 9-13.5"
+                                        />
+                                      </svg>
+                                    </div>
+                                  )}
                                 </td>
                               </tr>
                             ))}

@@ -9,6 +9,8 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.spring.be_booktours.entities.sub_entities.Payment;
+import com.spring.be_booktours.entities.sub_entities.Status;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -33,6 +35,6 @@ public class BookingHistory {
     private Set<String> specialRequest = new HashSet<>(); // yêu cầu đặc biệt
     private String emailUser; // email khách hàng
     private Double total; // tổng tiền
-    private String paymentStatus; // trạng thái thanh toán
-    private String status; // trạng thái
+    private Payment payment; // trạng thái thanh toán
+    private Status status; // trạng thái đơn
 }
