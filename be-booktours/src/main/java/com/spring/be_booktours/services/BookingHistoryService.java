@@ -100,6 +100,7 @@ public class BookingHistoryService {
         status.setStatusCode(1);
         status.setStatusName("Đang chờ xác nhận");
         bookingHistory.setStatus(status);
+        bookingHistory.setConfirmed(false);
 
         bookingHistoryRepository.save(bookingHistory);
 
@@ -126,6 +127,7 @@ public class BookingHistoryService {
             status.setStatusCode(2);
             status.setStatusName("Chờ xác nhận huỷ phòng");
             bookingHistory.setStatus(status);
+            bookingHistory.setConfirmed(false);
             bookingHistoryRepository.save(bookingHistory);
             response.setStatus(200);
             response.setMessage("Đang chờ xác nhận huỷ đặt phòng, mã đặt phòng: " + bookingCode);
@@ -183,6 +185,7 @@ public class BookingHistoryService {
             Status status = new Status();
             status.setStatusCode(4);
             status.setStatusName("Đã huỷ");
+            bookingHistory.setConfirmed(true);
 
             bookingHistory.setStatus(status);
             bookingHistoryRepository.save(bookingHistory);
@@ -229,6 +232,7 @@ public class BookingHistoryService {
             status.setStatusCode(3);
             status.setStatusName("Đã xác nhận");
             bookingHistory.setStatus(status);
+            bookingHistory.setConfirmed(true);
             bookingHistoryRepository.save(bookingHistory);
             response.setStatus(200);
             response.setMessage("Xác nhận đơn đặt phòng thành công, mã đặt phòng: " + bookingCode);
@@ -240,7 +244,6 @@ public class BookingHistoryService {
     // tìm đơn đặt theo bookingcode
     public MyResponse<BookingHistory> getBookingByBookingCode(String bookingCode) {
         MyResponse<BookingHistory> response = new MyResponse<>();
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
         // lấy danh sách booking của khách hàng
         BookingHistory bookingHistory = bookingHistoryRepository.findByBookingCode(bookingCode);
@@ -249,7 +252,7 @@ public class BookingHistoryService {
             response.setMessage("Không tìm thấy lịch sử đặt phòng");
         } else {
             response.setStatus(200);
-            response.setMessage("Lịch sử đặt phòng của khách hàng " + auth.getName());
+            response.setMessage("Lịch sử đặt phòng, mã đặt " + bookingCode);
             response.setData(bookingHistory);
         }
         return response;

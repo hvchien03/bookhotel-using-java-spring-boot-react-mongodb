@@ -37,4 +37,5 @@ public class BookingHistory {
     private Double total; // tổng tiền
     private Payment payment; // trạng thái thanh toán
     private Status status; // trạng thái đơn
+    private boolean confirmed; // xác nhận đơn
 }

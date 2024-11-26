@@ -223,14 +223,33 @@ export default class HotelService {
     }
   }
 
+  //xác nhận huỷ booking
+  static async confirmCancelBooking(bookingCode) {
+    try {
+      const response = await axios.put(
+        this.ADMIN_URL + `/booking/confirmcancel/${bookingCode}`,
+        {},
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  }
+
   //tìm kiếm booking theo mã booking
   static async searchBooking(bookingCode) {
     try {
+      console.log("Dữ liệu trong service: ", bookingCode);
       const response = await axios.get(
         this.ADMIN_URL + `/booking/code/${bookingCode}`,
         {
           headers: {
-            "Content-Type": "application/json",
             Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
         }

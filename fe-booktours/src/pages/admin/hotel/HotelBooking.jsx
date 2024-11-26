@@ -8,7 +8,7 @@ import { CSVLink } from "react-csv";
 import { TableIcon } from "@heroicons/react/outline";
 import HotelService from "../../../services/hotel/HotelService";
 import DetailBookingView from "../../../components/admin/hotel/DetailBookingView";
-//tìm kiếm đang lỗi
+//tìm kiếm đang lỗi luôn chán quá
 const HotelBooking = () => {
   // const navigate = useNavigate();
   const cancelButtonRef = useRef();
@@ -16,16 +16,11 @@ const HotelBooking = () => {
   const [bookHotel, setBookHotel] = useState([]);
   const [bookingStatus, setBookingStatus] = useState();
   const [selectedViewDetail, setSelectedViewDetail] = useState({});
-  // const [search, setSearch] = useState("");
+  const [search, setSearch] = useState("");
   const [objectQuery, setObjectQuery] = useState({
     page: 1,
     limit: 10,
   });
-  //const { tourId } = useParams();
-  // const [tour, setTour] = useState({});
-  // const [departureDate, setDepartureDate] = useState(
-  //   new Date().toISOString().split("T")[0]
-  // );
 
   useEffect(() => {
     document.title = "Danh sách đặt khách sạn";
@@ -46,13 +41,65 @@ const HotelBooking = () => {
       }
     };
     fetchBooking();
-  }, [bookingStatus, objectQuery]);
-
-
+  }, [bookingStatus, objectQuery.page]);
 
   const handleShowViewDetailBooking = (bookHotel) => () => {
     setSelectedViewDetail(bookHotel);
     setOpen(true);
+  };
+
+  const handleSearch = async () => {
+    try {
+      if (search === "") {
+        alert("Vui lòng nhập mã booking");
+        return;
+      }
+      console.log("Đã bấm tìm kiếm", search);
+      const response = await HotelService.searchBooking(search);
+      if (response.status === 200) {
+        setBookHotel(response.data);
+        console.log(response.data);
+        if (response.data.length === 0) {
+          alert("Không tìm thấy booking");
+        }
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleConfirmBooking = async (bookingCode, statusCode) => {
+    try {
+      if (statusCode === 1) {
+        const response = await HotelService.confirmBooking(bookingCode);
+        if (response.status === 200) {
+          // Cập nhật state để reflect việc xác nhận
+          setBookHotel((prevState) => ({
+            ...prevState,
+            content: prevState.content.map((booking) =>
+              booking.bookingCode === bookingCode
+                ? { ...booking, confirmed: true }
+                : booking
+            ),
+          }));
+        }
+      } else {
+        const response = await HotelService.confirmCancelBooking(bookingCode);
+        if (response.status === 200) {
+          // Cập nhật state để reflect việc xác nhận
+          setBookHotel((prevState) => ({
+            ...prevState,
+            content: prevState.content.map((booking) =>
+              booking.bookingCode === bookingCode
+                ? { ...booking, confirmed: true }
+                : booking
+            ),
+          }));
+        }
+      }
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   return (
@@ -83,15 +130,15 @@ const HotelBooking = () => {
                 {/* Filter */}
                 <div className="mt-5 gap-5 md:flex">
                   <div className="md:mb-0 mb-3 flex gap-3">
-                    {bookHotel?.content?.length > 0 && (
+                    {bookHotel?.length > 0 && (
                       <CSVLink
                         className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-teal-600 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
-                        data={bookHotel?.content?.map((bookHotel) => ({
+                        data={bookHotel?.map((bookHotel) => ({
                           "Số booking": bookHotel.bookingCode,
                           "Ngày đặt": formatDateYYYYMMDD(bookHotel.bookingDate),
                           "Email đặt": bookHotel.emailUser,
                           "Khách sạn": bookHotel.hotelName,
-                          Phòng: bookHotel.roomName,
+                          Phòng: bookHotel.roomType,
                           "Ngày nhận phòng": formatDateYYYYMMDD(
                             bookHotel.checkIn
                           ),
@@ -103,7 +150,7 @@ const HotelBooking = () => {
                               ? bookHotel.specialRequest.join(", ")
                               : "Không có yêu cầu",
                           "Tổng tiền": formatPrice(bookHotel.total),
-                          "Trạng thái": bookHotel.paymentStatus,
+                          "Trạng thái": bookHotel.status.statusName,
                         }))}
                         filename="danh-sach-dat-khach-san.csv"
                       >
@@ -118,57 +165,51 @@ const HotelBooking = () => {
                   <div className="md:mb-0 mb-3 flex gap-3">
                     <div className="w-full max-w-sm min-w-[200px]">
                       <div className="relative flex items-center">
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          viewBox="0 0 24 24"
-                          fill="currentColor"
-                          className="absolute w-5 h-5 top-2.5 left-2.5 text-slate-600"
-                        >
-                          <path
-                            fillRule="evenodd"
-                            d="M10.5 3.75a6.75 6.75 0 1 0 0 13.5 6.75 6.75 0 0 0 0-13.5ZM2.25 10.5a8.25 8.25 0 1 1 14.59 5.28l4.69 4.69a.75.75 0 1 1-1.06 1.06l-4.69-4.69A8.25 8.25 0 0 1 2.25 10.5Z"
-                            clipRule="evenodd"
-                          />
-                        </svg>
-
-                        <input
-                          className="w-full bg-transparent placeholder:text-slate-400 text-slate-700 text-sm border border-slate-200 rounded-md pl-10 pr-3 py-2 transition duration-300 ease focus:outline-none focus:border-slate-400 hover:border-slate-300 shadow-sm focus:shadow"
-                          placeholder="Nhập mã đặt khách sạn"
-                          //value={search}
-                          //onChange={(e) => setSearch(e.target.value)}
-                        />
-
-                        <button
-                          className="rounded-md bg-slate-800 py-2 px-4 border border-transparent text-center text-sm text-white transition-all shadow-md hover:shadow-lg focus:bg-slate-700 focus:shadow-none active:bg-slate-700 hover:bg-slate-700 active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none ml-2"
-                          type="button"
-                          // onClick={async () => {
-                          //   const response = await HotelService.searchBooking(
-                          //     search
-                          //   );
-                          //   if (response.status === 200) {
-                          //     setBookHotel(response.data);
-                          //   }
-                          //   alert("Đơn đặt không tồn tại");
-                          // }}
-                        >
-                          Tìm kiếm
-                        </button>
+                        <div className="w-full max-w-sm min-w-[200px]">
+                          <div className="relative">
+                            <input
+                              className="w-full bg-transparent placeholder:text-slate-400 text-slate-700 text-sm border border-slate-200 rounded-md pl-3 pr-28 py-2 transition duration-300 ease focus:outline-none focus:border-slate-400 hover:border-slate-300 shadow-sm focus:shadow"
+                              placeholder="Nhập mã đặt phòng"
+                              value={search}
+                              onChange={(e) => setSearch(e.target.value)}
+                            />
+                            <button
+                              className="absolute top-1 right-1 flex items-center rounded bg-slate-800 py-1 px-2.5 border border-transparent text-center text-sm text-white transition-all shadow-sm hover:shadow focus:bg-slate-700 focus:shadow-none active:bg-slate-700 hover:bg-slate-700 active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
+                              type="button"
+                              onClick={handleSearch}
+                            >
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                viewBox="0 0 24 24"
+                                fill="currentColor"
+                                className="w-4 h-4 mr-2"
+                              >
+                                <path
+                                  fillRule="evenodd"
+                                  d="M10.5 3.75a6.75 6.75 0 1 0 0 13.5 6.75 6.75 0 0 0 0-13.5ZM2.25 10.5a8.25 8.25 0 1 1 14.59 5.28l4.69 4.69a.75.75 0 1 1-1.06 1.06l-4.69-4.69A8.25 8.25 0 0 1 2.25 10.5Z"
+                                  clipRule="evenodd"
+                                />
+                              </svg>
+                              Tìm kiếm
+                            </button>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
                   <div className="ml-auto grid grid-cols-1 md:grid-cols-2 gap-3">
                     <div>
-                      <select
+                      {/* <select
                         className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-sky500 focus:border-ssky00 sm:text-sm rounded-md"
                         //value={departureDate}
                         //onChange={(e) => setDepartureDate(e.target.value)}
                       >
-                        {/* {tour.departureDates?.sort().map((date, index) => (
+                        {tour.departureDates?.sort().map((date, index) => (
                           <option key={index} value={date}>
                             {formatDateYYYYMMDD(date)}
                           </option>
-                        ))} */}
-                      </select>
+                        ))}
+                      </select> */}
                     </div>
                     <div>
                       <select
@@ -178,6 +219,8 @@ const HotelBooking = () => {
                       >
                         <option value="1">Đang chờ xác nhận</option>
                         <option value="3">Đã xác nhận</option>
+                        <option value="2">Chờ xác nhận huỷ phòng</option>
+                        <option value="4">Đã huỷ</option>
                       </select>
                     </div>
                   </div>
@@ -290,12 +333,17 @@ const HotelBooking = () => {
                                   </svg>
                                 </td>
                                 <td className="px-4 py-4 whitespace-nowrap text-right text-sm font-medium flex justify-center">
-                                  {!bookHotel.confirmed ? (
+                                  {/* {!bookHotel.confirmed ? (
                                     <input
                                       type="checkbox"
                                       className="focus:ring-sky-500 h-4 w-4 text-sky-600 border-gray-300 rounded"
                                       checked={bookHotel.confirmed}
-                                      //onChange={handleConfirmBooking}
+                                      onChange={() =>
+                                        handleConfirmBooking(
+                                          bookHotel.bookingCode,
+                                          bookHotel.status.statusCode
+                                        )
+                                      }
                                     />
                                   ) : (
                                     <div className="text-gray-500">
@@ -313,6 +361,57 @@ const HotelBooking = () => {
                                           d="m4.5 12.75 6 6 9-13.5"
                                         />
                                       </svg>
+                                      Đã xác nhận
+                                    </div>
+                                  )} */}
+                                  {bookHotel.status.statusCode === 1 ||
+                                  bookHotel.status.statusCode === 2 ? (
+                                    <input
+                                      type="checkbox"
+                                      className="focus:ring-sky-500 h-4 w-4 text-sky-600 border-gray-300 rounded"
+                                      checked={bookHotel.confirmed}
+                                      onChange={() =>
+                                        handleConfirmBooking(
+                                          bookHotel.bookingCode,
+                                          bookHotel.status.statusCode
+                                        )
+                                      }
+                                    />
+                                  ) : bookHotel.status.statusCode === 3 ? (
+                                    <div className="text-gray-500">
+                                      <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                        strokeWidth={1.5}
+                                        stroke="green"
+                                        className="size-6"
+                                      >
+                                        <path
+                                          strokeLinecap="round"
+                                          strokeLinejoin="round"
+                                          d="M4.5 12.75l6 6 9-13.5"
+                                        />
+                                      </svg>
+                                      Đã xác nhận
+                                    </div>
+                                  ) : (
+                                    <div className="text-red-500">
+                                      <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                        strokeWidth={1.5}
+                                        stroke="red"
+                                        className="size-6"
+                                      >
+                                        <path
+                                          strokeLinecap="round"
+                                          strokeLinejoin="round"
+                                          d="M4.5 12.75l6 6 9-13.5"
+                                        />
+                                      </svg>
+                                      Đã huỷ
                                     </div>
                                   )}
                                 </td>
