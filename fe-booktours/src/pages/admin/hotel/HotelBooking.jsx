@@ -34,7 +34,7 @@ const HotelBooking = () => {
         );
         if (response.status === 200) {
           document.title = `Danh sách đặt khách sạn`;
-          setBookHotel(response.data);
+          setBookHotel(response.data.content);
         }
       } catch (error) {
         console.error(error);
@@ -56,10 +56,11 @@ const HotelBooking = () => {
       }
       console.log("Đã bấm tìm kiếm", search);
       const response = await HotelService.searchBooking(search);
+      const data = Array.isArray(response.data) ? response.data : [response.data];
       if (response.status === 200) {
-        setBookHotel(response.data);
-        console.log(response.data);
-        if (response.data.length === 0) {
+        setBookHotel(data);
+        console.log(bookHotel);
+        if (console.log(bookHotel) === null) {
           alert("Không tìm thấy booking");
         }
       }
@@ -130,7 +131,7 @@ const HotelBooking = () => {
                 {/* Filter */}
                 <div className="mt-5 gap-5 md:flex">
                   <div className="md:mb-0 mb-3 flex gap-3">
-                    {bookHotel?.length > 0 && (
+                    {bookHotel.length > 0 && (
                       <CSVLink
                         className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-teal-600 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
                         data={bookHotel?.map((bookHotel) => ({
@@ -283,7 +284,7 @@ const HotelBooking = () => {
                             </tr>
                           </thead>
                           <tbody>
-                            {bookHotel?.content?.map((bookHotel, index) => (
+                            {bookHotel?.map((bookHotel, index) => (
                               <tr
                                 key={index}
                                 className={

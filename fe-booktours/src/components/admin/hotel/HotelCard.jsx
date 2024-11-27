@@ -6,7 +6,7 @@ const HotelCard = (props) => {
   return (
     <div className="rounded-xl overflow-hidden shadow-lg flex flex-col">
       <div className="relative group">
-        <Link to={`/tour-detail/${props.hotel.hotelId}`}>
+        <Link to={`/admin/hotel-update/${props.hotel.hotelId}`}>
           <img
             className="w-full h-56 object-cover"
             src={props.hotel.image[0]}
@@ -15,7 +15,7 @@ const HotelCard = (props) => {
           />
           <div className="hover:bg-transparent transition duration-300 absolute bottom-0 top-0 right-0 left-0 bg-gray-900 opacity-25"></div>
         </Link>
-        <Link to={`/tour-detail/${props.hotel?.hotelId}`}>
+        <Link to={`/admin/hotel-update/${props.hotel?.hotelId}`}>
           <div className="rounded-lg text-xs absolute top-0 right-0 bg-sky-600 px-4 py-2 text-white mt-3 mr-3 hover:bg-white hover:text-sky-600 transition duration-500 ease-in-out">
             {props.hotel?.address?.city}
           </div>
