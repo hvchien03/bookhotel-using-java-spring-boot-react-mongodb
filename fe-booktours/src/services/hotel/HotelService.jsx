@@ -182,6 +182,25 @@ export default class HotelService {
       throw error;
     }
   }
+
+  //xoá phòng
+  static async deleteRoom(hotelId, roomId) {
+    try {
+      const response = await axios.delete(
+        this.ADMIN_URL + `/${hotelId}/delete-room/${roomId}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  }
+
   //lấy danh sách booking theo status
   static async getBookingByStatus(statusCode, objectQuery) {
     try {
@@ -254,6 +273,19 @@ export default class HotelService {
           },
         }
       );
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  }
+  // tìm khách sạn theo tên hoặc địa điểm
+  static async searchHotel(searchData) {
+    try {
+      let page = searchData.page - 1;
+      let url =
+        this.BASE_URL +
+        `/search?input=${searchData.locationOrName}&page=${page}&limit=${searchData.limit}`;
+      const response = await axios.get(url);
       return response.data;
     } catch (error) {
       throw error;

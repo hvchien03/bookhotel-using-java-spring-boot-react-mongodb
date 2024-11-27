@@ -69,7 +69,12 @@ const HotelCreate = () => {
     try {
       const response = await HotelService.createHotel(hotel);
       if (response?.status === 200) {
-        alert(`Thêm khách sạn thành công, mã hotel: ${response.data}`);
+        alert(`Thêm khách sạn thành công, mã hotel: ${response.data}
+              \nTrang sẽ được chuyển hướng trong giây lát`);
+        // Chờ 2 giây trước khi chuyển hướng
+        setTimeout(() => {
+          navigate(`/admin/hotel-update/${response.data}`);
+        }, 2000); // 2000ms = 2 giây
       } else {
         alert("Có lỗi xảy ra(" + response?.message + ")");
       }

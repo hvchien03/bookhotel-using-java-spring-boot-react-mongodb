@@ -395,6 +395,8 @@ const HotelUpdate = () => {
         defaultRoom={defaultRoom}
         setDefaultRoom={setDefaultRoom}
         hotelId={hotelId}
+        refreshData={refreshData}
+        setRefreshData={setRefreshData}
       />
       <main className="flex-1">
         <div className="py-6">

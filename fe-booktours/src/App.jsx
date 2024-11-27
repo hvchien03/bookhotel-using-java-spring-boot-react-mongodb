@@ -35,6 +35,8 @@ import HotelCreate from "./pages/admin/hotel/HotelCreate";
 import HotelUpdate from "./pages/admin/hotel/HotelUpdate";
 import RoomUpdate from "./pages/admin/hotel/RoomUpdate";
 import HotelBooking from "./pages/admin/hotel/HotelBooking";
+import Hotels from "./pages/hotel/Hotels";
+import HotelPage from "./pages/hotel/HotelPage";
 
 function App() {
   const context = useContext(GlobalContext);
@@ -63,6 +65,8 @@ function App() {
           path="/detail-airport-transfer/:airportTransferId"
           element={<DetailAirportTransfer />}
         />
+        <Route path="/hotel" element={<HotelPage />} />
+        <Route path="/hotels/:input" element={<Hotels />} />
 
         {/* Phải xác nhận email mới xem được */}
         {!context.profile?.verifiedEmail && (

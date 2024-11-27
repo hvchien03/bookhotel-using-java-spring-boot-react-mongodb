@@ -20,7 +20,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class RoomRequest {
     @NotBlank(message = "Kiểu phòng không được để trống")
-    @Pattern(regexp = "^[a-zA-ZÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚĂĐĨŨƠàáâãèéêìíòóôõùúăđĩũơƯĂẠ-ỹ0-9 ]*$", message = "Kiểu phòng chỉ được chứa chữ cái, số và khoảng trắng")
+    //@Pattern(regexp = "^[a-zA-ZÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚĂĐĨŨƠàáâãèéêìíòóôõùúăđĩũơƯĂẠ-ỹ0-9 ]*$", message = "Kiểu phòng chỉ được chứa chữ cái, số và khoảng trắng")
     private String roomType; // kiểu phòng
 
     // giá phải chia hết cho 1000 và lớn hơn 1000

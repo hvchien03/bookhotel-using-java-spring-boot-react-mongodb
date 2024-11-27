@@ -202,6 +202,24 @@ const RoomUpdate = () => {
       }
     }
   };
+
+  const handleDeleteRoom = async () => {
+    if (window.confirm("Bạn có chắc chắn muốn xoá phòng này không?")) {
+      try {
+        const response = await HotelService.deleteRoom(hotelId, roomId);
+        if (response?.status === 200) {
+          alert("Xoá phòng thành công\nTrang sẽ được chuyển hướng sau 2 giây");
+          setTimeout(() => {
+            navigate(-1);
+          }, 2000);
+        } else {
+          alert("Có lỗi xảy ra(" + response?.message + ")");
+        }
+      } catch (error) {
+        console.error("Error:", error);
+      }
+    }
+  };
   return (
     <>
       <main className="flex-1">
@@ -210,6 +228,16 @@ const RoomUpdate = () => {
             <h1 className="text-2xl font-semibold text-gray-900">
               Thay đổi thông tin phòng
             </h1>
+            {/* tạo button bên phải của thẻ h1, có responside */}
+            <div className="hidden lg:flex lg:justify-end lg:items-center lg:space-x-4">
+              <button
+                type="button"
+                className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-red-600 hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sky-500"
+                onClick={() => handleDeleteRoom()}
+              >
+                Xoá phòng
+              </button>
+            </div>
           </div>
           <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
             {/* Replace with your content */}

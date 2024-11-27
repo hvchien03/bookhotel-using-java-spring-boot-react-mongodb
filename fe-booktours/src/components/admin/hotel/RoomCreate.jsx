@@ -21,6 +21,10 @@ const RoomCreate = (props) => {
       });
       if (response.status === 200) {
         //navigate(`/admin/tour-update/${response?.data}`); //chỗ này chưa tạo trang update room
+        alert("Thêm loại phòng thành công");
+        setDefaultRoomError({});
+        props.setOpen(false);
+        props.setRefreshData(!props.refreshData);
       }
     } catch (error) {
       console.error(error);
